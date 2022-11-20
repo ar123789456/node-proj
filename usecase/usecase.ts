@@ -1,5 +1,5 @@
-import {RepositoryAuth, UseCaseAuth} from "../models/interface";
-import {User} from "../models/models";
+import {RepositoryAuth, RepositoryTodo, UseCaseAuth, UseCaseTodo} from "../models/interface";
+import {Filter, Todo, User} from "../models/models";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
@@ -20,7 +20,7 @@ export class AuthUsecase implements UseCaseAuth {
                         if (!passwordIsValid) {
                             reject({message: "Invalid password"});
                         }
-                        jwt.sign({user: result}, process.env.SECRET_KEY, {expiresIn: "1h"}, (err, token) => {
+                        jwt.sign({user: result}, process.env.SIGNATURE_JWT_SECRET, {expiresIn: "3h"}, (err, token) => {
                             if (err) {
                                 reject(err);
                             }
@@ -46,6 +46,51 @@ export class AuthUsecase implements UseCaseAuth {
     register(user: User): Promise<User> {
         return new Promise((resolve, reject) => {
             this.repository.set(user)
+                .then((result) => {
+                    resolve(result);
+                })
+                .catch((err) => {
+                    reject(err);
+                });
+        });
+    }
+}
+
+
+export class TodosUseCase implements UseCaseTodo {
+    repository: RepositoryTodo;
+
+    constructor(repository: RepositoryTodo) {
+        this.repository = repository;
+    }
+
+    create(todo: Todo): Promise<Todo> {
+        return new Promise((resolve, reject) => {
+            this.repository.set(todo)
+                .then((result) => {
+                    resolve(result);
+                })
+                .catch((err) => {
+                    reject(err);
+                });
+        });
+    }
+
+    get(filter: Filter): Promise<Todo[]> {
+        return new Promise((resolve, reject) => {
+            this.repository.get(filter)
+                .then((result) => {
+                    resolve(result);
+                })
+                .catch((err) => {
+                    reject(err);
+                });
+        });
+    }
+
+    update(todo: Todo): Promise<Todo> {
+        return new Promise((resolve, reject) => {
+            this.repository.update(todo)
                 .then((result) => {
                     resolve(result);
                 })
