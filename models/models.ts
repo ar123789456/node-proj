@@ -1,13 +1,13 @@
 
 export type User = {
-    id: number,
+    _id: number,
     name: string,
     password: string,
     token: string
 }
 
 export type Todo = {
-    id: number,
+    _id: number,
     title: string,
     description: string,
     status: string,
