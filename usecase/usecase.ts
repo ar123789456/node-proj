@@ -1,7 +1,8 @@
 import {RepositoryAuth, RepositoryTodo, UseCaseAuth, UseCaseTodo} from "../models/interface";
 import {Filter, Todo, User} from "../models/models";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
+import {Promise} from "mongoose";
+import bcrypt from 'bcrypt';
 
 //auth service business logic
 export class AuthUsecase implements UseCaseAuth {
@@ -25,8 +26,8 @@ export class AuthUsecase implements UseCaseAuth {
                                 reject(err);
                             }
                             result.token = token;
+                            resolve(result);
                         });
-                        resolve(result);
                     } else {
                         reject({message: "User not found"});
                     }
@@ -39,12 +40,13 @@ export class AuthUsecase implements UseCaseAuth {
 
     logout(): Promise<User> {
         return new Promise((resolve, reject) => {
-            resolve({id: 0, name: "", password: "", token: ""});
+            resolve({_id: 0, name: "", password: "", token: ""});
         });
     }
 
     register(user: User): Promise<User> {
         return new Promise((resolve, reject) => {
+            user.password = bcrypt.hashSync(user.password, 7);
             this.repository.set(user)
                 .then((result) => {
                     resolve(result);
@@ -64,9 +66,9 @@ export class TodosUseCase implements UseCaseTodo {
         this.repository = repository;
     }
 
-    create(todo: Todo): Promise<Todo> {
+    create(todo: Todo, userid:number): Promise<Todo> {
         return new Promise((resolve, reject) => {
-            this.repository.set(todo)
+            this.repository.set(todo, userid)
                 .then((result) => {
                     resolve(result);
                 })
@@ -76,9 +78,9 @@ export class TodosUseCase implements UseCaseTodo {
         });
     }
 
-    get(filter: Filter): Promise<Todo[]> {
+    get(filter: Filter, userid:number): Promise<Todo[]> {
         return new Promise((resolve, reject) => {
-            this.repository.get(filter)
+            this.repository.get(filter, userid)
                 .then((result) => {
                     resolve(result);
                 })
@@ -88,9 +90,9 @@ export class TodosUseCase implements UseCaseTodo {
         });
     }
 
-    update(todo: Todo): Promise<Todo> {
+    update(todo: Todo, userid:number): Promise<Todo> {
         return new Promise((resolve, reject) => {
-            this.repository.update(todo)
+            this.repository.update(todo, userid)
                 .then((result) => {
                     resolve(result);
                 })

@@ -1,12 +1,12 @@
-import {User} from "../models/models";
+import {Filter, ITodo, IUser, Todo, User} from "../models/models";
 import {RepositoryAuth, RepositoryTodo} from "../models/interface";
-import mongoose, {Promise} from "mongoose";
+import {Model, Promise} from "mongoose";
 
 //Auth repository
 export class AuthRepository implements RepositoryAuth {
-    model: mongoose.Model<mongoose.Document>;
+    model: Model<IUser>;
 
-    constructor(model: mongoose.Model<mongoose.Document>) {
+    constructor(model: Model<IUser>) {
         this.model = model;
     }
 
@@ -27,7 +27,12 @@ export class AuthRepository implements RepositoryAuth {
 
     set(user: User): Promise<User> {
         return new Promise((resolve, reject) => {
-            this.model.create(user, (err, result) => {
+            this.model.create({
+                _id: Date.now(), //todo: change to uuid
+                name: user.name,
+                password: user.password,
+                token: user.token
+            }, (err, result) => {
                 if (err) {
                     reject(err);
                 }
@@ -53,18 +58,20 @@ export class AuthRepository implements RepositoryAuth {
 
 //Todos repository
 export class TodosRepository implements RepositoryTodo {
-    model: mongoose.Model<mongoose.Document>;
+    model: Model<ITodo>;
 
-    constructor(model: mongoose.Model<mongoose.Document>) {
+    constructor(model: Model<ITodo>) {
         this.model = model;
     }
 
-    get(filter: any): Promise<any> {
+    get(filter: Filter, userid:number): Promise<any> {
         return new Promise((resolve, reject) => {
-            this.model.find({
-                    status: filter.status,
-                    title: new RegExp(filter.search, "i")
-                }, (err, result) => {
+            let fltr = {
+                userid: userid,
+                status: filter.status,
+                title: new RegExp(filter.search, "i")
+            }
+            this.model.find(!filter.search&&!filter.status?{}:fltr, (err, result) => {
                     if (err) {
                         reject(err);
                     }
@@ -74,9 +81,15 @@ export class TodosRepository implements RepositoryTodo {
         });
     }
 
-    set(todo: any): Promise<any> {
+    set(todo: Todo, userid:number): Promise<Todo> {
         return new Promise((resolve, reject) => {
-            this.model.create(todo, (err, result) => {
+            this.model.create({
+                _id: Date.now(), //todo: change to uuid
+                title: todo.title,
+                description: todo.description,
+                status: todo.status,
+                userid: userid
+            }, (err, result) => {
                 if (err) {
                     reject(err);
                 }
@@ -85,10 +98,11 @@ export class TodosRepository implements RepositoryTodo {
         });
     }
 
-    update(todo: any): Promise<any> {
+    update(todo: Todo, userid:number): Promise<Todo> {
         return new Promise((resolve, reject) => {
             this.model.findOneAndUpdate({
                     _id: todo._id,
+                    userid: userid
                 }, todo, (err, result) => {
                     if (err) {
                         reject(err);

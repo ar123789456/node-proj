@@ -14,14 +14,14 @@ export interface RepositoryAuth {
 
 //interface for todos service
 export interface UseCaseTodo {
-    create: (todo: Todo) => Promise<Todo>;
-    get: (filter: Filter) => Promise<Todo[]>;
-    update: (todo: Todo) => Promise<Todo>;
+    create: (todo: Todo, userid:number) => Promise<Todo>;
+    get: (filter: Filter, userid:number) => Promise<Todo[]>;
+    update: (todo: Todo, userid:number) => Promise<Todo>;
 }
 
 export interface RepositoryTodo {
-    get: (filter: Filter) => Promise<Todo[]>;
-    set: (todo: Todo) => Promise<Todo>;
-    update: (todo: Todo) => Promise<Todo>;
+    get: (filter: Filter, userid:number) => Promise<Todo[]>;
+    set: (todo: Todo, userid:number) => Promise<Todo>;
+    update: (todo: Todo, userid:number) => Promise<Todo>;
 }
 
