@@ -2,14 +2,14 @@ import {Filter, ITodo, IUser, Todo, User} from "../models/models";
 import {RepositoryAuth, RepositoryTodo} from "../models/interface";
 import {Model, Promise} from "mongoose";
 
-//Auth repository
+/** @class MongoRepositoryAuth class for auth service */
 export class AuthRepository implements RepositoryAuth {
     model: Model<IUser>;
 
     constructor(model: Model<IUser>) {
         this.model = model;
     }
-
+    /**@method get take {@link User} with name and find it in database and return full {@link User} */
     get(user: User): Promise<User> {
         return new Promise((resolve, reject) => {
                 this.model.findOne({
@@ -24,7 +24,7 @@ export class AuthRepository implements RepositoryAuth {
             }
         );
     }
-
+    /**@method set take {@link User} with name and password and save it in database and return full {@link User}*/
     set(user: User): Promise<User> {
         return new Promise((resolve, reject) => {
             this.model.create({
@@ -40,7 +40,7 @@ export class AuthRepository implements RepositoryAuth {
             });
         });
     }
-
+    /**@method update take {@link User} with name and password and update it in database and return full {@link User}*/
     update(user: User): Promise<User> {
         return new Promise((resolve, reject) => {
             this.model.findOneAndUpdate({
@@ -56,14 +56,14 @@ export class AuthRepository implements RepositoryAuth {
     }
 }
 
-//Todos repository
+/** @class MongoRepositoryTodo class for todos service */
 export class TodosRepository implements RepositoryTodo {
     model: Model<ITodo>;
 
     constructor(model: Model<ITodo>) {
         this.model = model;
     }
-
+    /**@method get take {@link Filter} and return array of {@link Todo} by filter*/
     get(filter: Filter, userid:number): Promise<any> {
         return new Promise((resolve, reject) => {
             let fltr = {
@@ -80,7 +80,7 @@ export class TodosRepository implements RepositoryTodo {
             ).skip(filter.startIndex).limit(filter.endIndex - filter.startIndex);
         });
     }
-
+    /**@method set take {@link Todo} and save it in database and return full {@link Todo}*/
     set(todo: Todo, userid:number): Promise<Todo> {
         return new Promise((resolve, reject) => {
             this.model.create({
@@ -97,7 +97,7 @@ export class TodosRepository implements RepositoryTodo {
             });
         });
     }
-
+    /**@method update take {@link Todo} and update it in database and return full {@link Todo}*/
     update(todo: Todo, userid:number): Promise<Todo> {
         return new Promise((resolve, reject) => {
             this.model.findOneAndUpdate({

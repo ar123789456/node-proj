@@ -2,7 +2,10 @@ import {UseCaseAuth, UseCaseTodo} from "../../models/interface";
 import express from "express";
 import jwt from "jsonwebtoken";
 
-//authorization handlers
+/** @class AUTH
+ *  AuthRouter
+ *  single class for auth service
+ *  */
 export class AUTH {
     usecase: UseCaseAuth;
 
@@ -10,10 +13,11 @@ export class AUTH {
         this.usecase = usecase;
     }
 
-    //login handler
+    /**@method login tace name and password and return token */
     login(req: express.Request, res: express.Response) {
         const {name, password}: { name: string, password: string } = req.body;
         if (name && password) {
+            /** get user id from token */
             this.usecase.login({_id: 0, name: name, password: password, token: ""})
                 .then((result) => {
                     res.cookie("token", result.token, {maxAge: 900000});
@@ -27,10 +31,11 @@ export class AUTH {
         }
     }
 
-    //logout handler
+    /**@method logout remove token from cookie */
     logout(req: express.Request, res: express.Response) {
         const {name, password}: { name: string, password: string } = req.body;
         if (name && password) {
+            /** get user id from token */
             this.usecase.login({_id: 0, name: name, password: password, token: ""})
                 .then((result) => {
                     res.cookie("token", result.token, {maxAge: 0});
@@ -44,10 +49,11 @@ export class AUTH {
         }
     }
 
-    //register handler
+    /**@method register tace name and password and save it in database */
     register(req: express.Request, res: express.Response) {
         const {name, password}: { name: string, password: string } = req.body;
         if (name && password) {
+            /** get user id from token */
             this.usecase.register({_id: 0, name: name, password: password, token: ""})
                 .then((result) => {
                     res.status(200).json(result);
@@ -61,7 +67,9 @@ export class AUTH {
     }
 }
 
-//todos handlers
+/**@class TODO
+ * single class for todo service
+ */
 export class TODO {
     usecase: UseCaseTodo;
 
@@ -72,6 +80,7 @@ export class TODO {
     //create handler
     create(req: express.Request, res: express.Response) {
         const {title, description, status}: { title: string, description: string, status: string } = req.body;
+        /** get user id from token */
         jwt.verify(req.cookies.token, process.env.SIGNATURE_JWT_SECRET, (err, decoded) => {
             if (err) {
                 res.status(401).json({message: "Invalid token"});
@@ -107,6 +116,7 @@ export class TODO {
             endIndex
         }: { status: string, search: string, startIndex: number, endIndex: number } = req.body;
         console.log(req.body);
+        /** get user id from token */
         jwt.verify(req.cookies.token, process.env.SIGNATURE_JWT_SECRET, (err, decoded) => {
             if (err) {
                 res.status(401).json({message: "Invalid token"});
@@ -135,6 +145,7 @@ export class TODO {
             description,
             status
         }: { _id: number, title: string, description: string, status: string } = req.body;
+        /** get user id from token */
         jwt.verify(req.cookies.token, process.env.SIGNATURE_JWT_SECRET, (err, decoded) => {
             if (err) {
                 res.status(401).json({message: "Invalid token"});
